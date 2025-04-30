@@ -12,6 +12,7 @@ model users {
   username    String    @db.VarChar(50)
   email       String    @unique @db.VarChar(100)
   password    String    @db.VarChar(100)
+  isActive    Boolean   @default(true)
   update_date DateTime? @default(now()) @db.Timestamp(6)
   create_date DateTime? @default(now()) @db.Timestamp(6)
 }
