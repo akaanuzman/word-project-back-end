@@ -10,6 +10,11 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { LoginResDTO, LoginReqDTO } from './DTOs/login.dto';
 import { RegisterResDTO, RegisterReqDTO } from './DTOs/register.dto';
+import * as crypto from 'crypto';
+import {
+  ForgotPasswordReqDTO,
+  ForgotPasswordResDTO,
+} from './DTOs/password.dto';
 
 @Injectable()
 export class AuthService {
@@ -120,6 +125,53 @@ export class AuthService {
         throw error;
       }
       throw new InternalServerErrorException('An error occurred during login');
+    }
+  }
+
+  async forgotPassword(
+    body: ForgotPasswordReqDTO,
+  ): Promise<ForgotPasswordResDTO> {
+    try {
+      const { email } = body;
+      const user = await this.prisma.users.findUnique({
+        where: { email },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException(
+          'Invalid email address provided for reset',
+        );
+      }
+
+      const randomHexString = crypto.randomBytes(16).toString('hex');
+      const resetPasswordToken = crypto
+        .createHash('SHA256')
+        .update(randomHexString)
+        .digest('hex');
+
+      const resetTokenExpiration = new Date(Date.now() + 3600000);
+
+      await this.prisma.users.update({
+        where: { id: user.id },
+        data: {
+          reset_token: resetPasswordToken,
+          reset_token_expiration: resetTokenExpiration,
+        },
+      });
+
+      const response: ForgotPasswordResDTO = {
+        message: 'Reset token generated successfully',
+      };
+
+      return response;
+    } catch (error) {
+      console.log(error);
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'An error occurred during password reset',
+      );
     }
   }
 }
