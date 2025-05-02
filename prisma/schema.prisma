@@ -17,3 +17,15 @@ model users {
   update_date DateTime? @default(now()) @db.Timestamp(6)
   create_date DateTime? @default(now()) @db.Timestamp(6)
 }
+
+model vocable {
+  id        Int     @id @default(autoincrement())
+  name      String  @db.VarChar(100)
+  level     Int?
+  vocableGroupId Int?
+}
+
+model vocableGroup {
+  id        Int     @id @default(autoincrement())
+  name      String  @db.VarChar(100)
+}
