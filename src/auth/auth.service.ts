@@ -15,12 +15,14 @@ import {
   ForgotPasswordReqDTO,
   ForgotPasswordResDTO,
 } from './DTOs/password.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly emailService: MailService,
   ) {}
 
   async register(registerDto: RegisterReqDTO): Promise<RegisterResDTO> {
@@ -162,6 +164,12 @@ export class AuthService {
       const response: ForgotPasswordResDTO = {
         message: 'Reset token generated successfully',
       };
+
+      await this.emailService.sendPasswordResetMail(
+        user.email,
+        user.username,
+        resetPasswordToken,
+      );
 
       return response;
     } catch (error) {

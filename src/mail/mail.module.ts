@@ -11,19 +11,23 @@ import { AppConfigService } from 'src/config/config.service';
     MailerModule.forRootAsync({
       useFactory: (configService: AppConfigService) => ({
         transport: {
+          service: 'gmail',
           host: configService.mail.host as string,
-          secure: configService.mail.secure as boolean,
           port: configService.mail.port as number,
+          secure: configService.mail.secure as boolean,
           auth: {
             user: configService.mail.user as string,
             pass: configService.mail.password as string,
+          },
+          tls: {
+            rejectUnauthorized: false,
           },
         },
         defaults: {
           from: `"${configService.mail.fromName as string}" <${configService.mail.from as string}>`,
         },
         template: {
-          dir: join(__dirname, 'templates'),
+          dir: join(process.cwd(), 'src/mail/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
