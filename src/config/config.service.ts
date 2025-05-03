@@ -88,7 +88,7 @@ export class AppConfigService {
       case 'number':
         return Number(value);
       case 'boolean':
-        return value === 'true' || value === 'True' || value === '1';
+        return value.toLowerCase() === 'true' || value === '1';
       default:
         return value;
     }
