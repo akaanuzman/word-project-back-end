@@ -14,8 +14,6 @@ function validateEnvVariables(
     'MAIL_FROM_NAME',
     'MAIL_FROM',
     'JWT_SECRET',
-    'JWT_ACCESS_EXPIRATION',
-    'JWT_REFRESH_EXPIRATION',
   ];
 
   const missingVars = requiredEnvVars.filter(

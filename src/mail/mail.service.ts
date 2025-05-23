@@ -1,20 +1,34 @@
-import { Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { Injectable, Logger } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
+import { join } from 'path';
 
 @Injectable()
 export class MailService {
+  private readonly logger = new Logger(MailService.name);
+
   constructor(private mailerService: MailerService) {}
 
   async sendWelcomeMail(email: string, username: string): Promise<void> {
-    await this.mailerService.sendMail({
-      to: email,
-      subject: 'Hoşgeldiniz!',
-      template: './welcome',
-      context: {
-        username,
-        date: new Date(),
-      },
-    });
+    try {
+      this.logger.log(`Sending welcome email to ${email}`);
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Welcome to WordWave!',
+        template: './welcome.hbs',
+        context: {
+          username,
+          date: new Date(),
+        },
+      });
+      this.logger.log(`Welcome email sent to ${email} successfully`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to send welcome email to ${email}`,
+        error.stack,
+      );
+      throw error;
+    }
   }
 
   async sendPasswordResetMail(
@@ -22,17 +36,43 @@ export class MailService {
     username: string,
     token: string,
   ): Promise<void> {
-    const url = `https://your-frontend-app.com/reset-password?token=${token}`;
+    try {
+      const url = `http://localhost:3000/reset-password?token=${encodeURIComponent(token)}`;
+      this.logger.log(
+        `Sending password reset email to ${email} with reset URL: ${url.substring(0, 50)}...`,
+      );
 
-    await this.mailerService.sendMail({
-      to: email,
-      subject: 'Şifre Sıfırlama',
-      template: './password-reset',
-      context: {
-        username,
-        url,
-      },
-    });
+      const imagesPath = join(process.cwd(), 'src/mail/templates/images');
+
+      await this.mailerService.sendMail({
+        to: email,
+        subject: 'Reset Your Password',
+        template: './password-reset.hbs',
+        context: {
+          username,
+          url,
+        },
+        attachments: [
+          {
+            filename: 'aubergine.png',
+            path: join(imagesPath, 'aubergine.png'),
+            cid: 'aubergine',
+          },
+          {
+            filename: 'tomato.png',
+            path: join(imagesPath, 'tomato.png'),
+            cid: 'tomato',
+          },
+        ],
+      });
+      this.logger.log(`Password reset email sent to ${email} successfully`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to send password reset email to ${email}`,
+        error.stack,
+      );
+      throw error;
+    }
   }
 
   async sendCustomMail(
@@ -41,11 +81,18 @@ export class MailService {
     template: string,
     context: Record<string, any>,
   ): Promise<void> {
-    await this.mailerService.sendMail({
-      to,
-      subject,
-      template,
-      context,
-    });
+    try {
+      this.logger.log(`Sending custom email to ${to}`);
+      await this.mailerService.sendMail({
+        to,
+        subject,
+        template,
+        context,
+      });
+      this.logger.log(`Custom email sent to ${to} successfully`);
+    } catch (error) {
+      this.logger.error(`Failed to send custom email to ${to}`, error.stack);
+      throw error;
+    }
   }
 }
