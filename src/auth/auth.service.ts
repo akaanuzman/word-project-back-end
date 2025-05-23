@@ -175,7 +175,7 @@ export class AuthService {
 
       return response;
     } catch (error) {
-      console.log(error);
+      this.logger.error(error.message, error.stack);
       if (error instanceof UnauthorizedException) {
         throw error;
       }
