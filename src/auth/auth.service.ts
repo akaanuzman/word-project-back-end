@@ -14,6 +14,8 @@ import * as crypto from 'crypto';
 import {
   ForgotPasswordReqDTO,
   ForgotPasswordResDTO,
+  ResetPasswordReqDTO,
+  ResetPasswordResDTO,
 } from './DTOs/password.dto';
 import { MailService } from 'src/mail/mail.service';
 
@@ -174,6 +176,68 @@ export class AuthService {
       return response;
     } catch (error) {
       console.log(error);
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'An error occurred during password reset',
+      );
+    }
+  }
+
+  async resetPassword(body: ResetPasswordReqDTO): Promise<ResetPasswordResDTO> {
+    try {
+      const { token, password } = body;
+
+      if (!token) {
+        throw new UnauthorizedException('Reset token is required');
+      }
+
+      if (!password) {
+        throw new UnauthorizedException('Password is required');
+      }
+
+      // Find user with this reset token
+      const user = await this.prisma.users.findFirst({
+        where: {
+          reset_token: token,
+        },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('Invalid or expired reset token');
+      }
+
+      // Check if token has expired
+      const now = new Date();
+      if (!user.reset_token_expiration || user.reset_token_expiration < now) {
+        throw new UnauthorizedException('Reset token has expired');
+      }
+
+      // Hash the new password
+      let hashedPassword: string;
+      try {
+        hashedPassword = await bcrypt.hash(password, 10);
+      } catch (hashError) {
+        throw new InternalServerErrorException(
+          'Password hashing process failed',
+        );
+      }
+
+      // Update user with new password and clear reset token fields
+      await this.prisma.users.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          reset_token: null,
+          reset_token_expiration: null,
+        },
+      });
+
+      return {
+        message: 'Your password has been successfully reset',
+      };
+    } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw error;
       }

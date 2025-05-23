@@ -37,8 +37,10 @@ export class MailService {
     token: string,
   ): Promise<void> {
     try {
-      const url = `http://localhost:3000/reset-password?token=${token}`;
-      this.logger.log(`Sending password reset email to ${email}`);
+      const url = `http://localhost:3000/reset-password?token=${encodeURIComponent(token)}`;
+      this.logger.log(
+        `Sending password reset email to ${email} with reset URL: ${url.substring(0, 50)}...`,
+      );
 
       const imagesPath = join(process.cwd(), 'src/mail/templates/images');
 

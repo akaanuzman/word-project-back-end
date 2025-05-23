@@ -5,6 +5,8 @@ import { LoginReqDTO, LoginResDTO } from './DTOs/login.dto';
 import {
   ForgotPasswordReqDTO,
   ForgotPasswordResDTO,
+  ResetPasswordReqDTO,
+  ResetPasswordResDTO,
 } from './DTOs/password.dto';
 
 @Controller('auth')
@@ -28,5 +30,15 @@ export class AuthController {
     @Body() forgotPasswordDto: ForgotPasswordReqDTO,
   ): Promise<ForgotPasswordResDTO> {
     return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordReqDTO,
+  ): Promise<ResetPasswordResDTO> {
+    console.log('Reset password controller received request with token');
+    // Don't log the actual password for security
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }
