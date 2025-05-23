@@ -37,7 +37,6 @@ export class AuthController {
   async resetPassword(
     @Body() resetPasswordDto: ResetPasswordReqDTO,
   ): Promise<ResetPasswordResDTO> {
-    console.log('Reset password controller received request with token');
     // Don't log the actual password for security
     return this.authService.resetPassword(resetPasswordDto);
   }

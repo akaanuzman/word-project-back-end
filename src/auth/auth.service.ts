@@ -210,8 +210,18 @@ export class AuthService {
 
       // Check if token has expired
       const now = new Date();
-      if (!user.reset_token_expiration || user.reset_token_expiration < now) {
-        throw new UnauthorizedException('Reset token has expired');
+      if (!user.reset_token_expiration) {
+        throw new UnauthorizedException('Reset token is invalid');
+      }
+
+      // Compare dates to check if token is expired
+      if (user.reset_token_expiration < now) {
+        console.log(
+          `Token expired: Token expiry date ${user.reset_token_expiration.toISOString()}, Current date: ${now.toISOString()}`,
+        );
+        throw new UnauthorizedException(
+          'Reset token has expired. Please request a new password reset.',
+        );
       }
 
       // Hash the new password

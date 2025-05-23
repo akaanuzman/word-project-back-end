@@ -21,7 +21,7 @@ export class ResetPasswordReqDTO {
   @IsNotEmpty({ message: 'Token is required' })
   token: string;
 
-  @IsString()
+  @IsString({ message: 'Password must be a string' })
   @IsNotEmpty({ message: 'Password is required' })
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
