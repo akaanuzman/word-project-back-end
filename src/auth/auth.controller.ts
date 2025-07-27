@@ -8,22 +8,79 @@ import {
   ResetPasswordReqDTO,
   ResetPasswordResDTO,
 } from './DTOs/password.dto';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({
+    summary: 'User Login',
+    description:
+      'Authenticate user with email and password to receive access token',
+  })
+  @ApiBody({ type: LoginReqDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Login successful',
+    type: LoginResDTO,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid credentials or validation error',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid email or password',
+  })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   login(@Body() loginDto: LoginReqDTO): Promise<LoginResDTO> {
     return this.authService.login(loginDto);
   }
 
+  @ApiOperation({
+    summary: 'User Registration',
+    description: 'Create a new user account with email, username, and password',
+  })
+  @ApiBody({ type: RegisterReqDTO })
+  @ApiResponse({
+    status: 201,
+    description: 'User registered successfully',
+    type: RegisterResDTO,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error or user already exists',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Conflict - Email or username already exists',
+  })
   @Post('register')
   register(@Body() registerDto: RegisterReqDTO): Promise<RegisterResDTO> {
     return this.authService.register(registerDto);
   }
 
+  @ApiOperation({
+    summary: 'Forgot Password',
+    description: "Send password reset email to user's email address",
+  })
+  @ApiBody({ type: ForgotPasswordReqDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset email sent successfully',
+    type: ForgotPasswordResDTO,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid email format',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found with provided email',
+  })
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   forgotPassword(
@@ -32,6 +89,24 @@ export class AuthController {
     return this.authService.forgotPassword(forgotPasswordDto);
   }
 
+  @ApiOperation({
+    summary: 'Reset Password',
+    description: 'Reset user password using token received via email',
+  })
+  @ApiBody({ type: ResetPasswordReqDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset successfully',
+    type: ResetPasswordResDTO,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid token or password validation error',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or expired token',
+  })
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   async resetPassword(
