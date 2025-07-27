@@ -15,13 +15,22 @@ export class LoginReqDTO {
 
 export interface LoginResDTO {
   user: {
-    id: number;
-    username: string;
     email: string;
-    role: string;
+    username: string;
+    id: string;
+    profile_image: string | null;
+    is_premium: boolean;
+    current_level: number;
+    xp: number;
+    coins: number;
+    streak: number;
     isActive: boolean;
-    update_date: Date | null;
-    create_date: Date | null;
+    role: string;
+    last_login: Date | null;
+    reset_token: string | null;
+    reset_token_expiration: Date | null;
+    created_at: Date;
+    updated_at: Date;
   };
   token: string;
 }
