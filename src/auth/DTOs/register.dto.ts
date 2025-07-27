@@ -5,12 +5,25 @@ import {
   Matches,
   MinLength,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterReqDTO {
+  @ApiProperty({
+    description: 'User email address',
+    example: 'user@example.com',
+    type: String,
+  })
   @IsEmail({}, { message: 'Please enter a valid email address' })
   @IsNotEmpty({ message: 'Email address is required' })
   email: string;
 
+  @ApiProperty({
+    description:
+      'User password (minimum 8 characters, must contain uppercase, lowercase, and number)',
+    example: 'Password123',
+    type: String,
+    minLength: 8,
+  })
   @IsString()
   @IsNotEmpty({ message: 'Password is required' })
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
@@ -20,11 +33,56 @@ export class RegisterReqDTO {
   })
   password: string;
 
+  @ApiProperty({
+    description: 'Username for the account',
+    example: 'john_doe',
+    type: String,
+  })
   @IsNotEmpty({ message: 'Username is required' })
   username: string;
 }
 
-export interface RegisterResDTO {
+export class RegisterResDTO {
+  @ApiProperty({
+    description: 'User information',
+    type: 'object',
+    properties: {
+      email: { type: 'string', example: 'user@example.com' },
+      username: { type: 'string', example: 'john_doe' },
+      id: { type: 'string', example: '123e4567-e89b-12d3-a456-426614174000' },
+      profile_image: { type: 'string', nullable: true, example: null },
+      is_premium: { type: 'boolean', example: false },
+      current_level: { type: 'number', example: 1 },
+      xp: { type: 'number', example: 0 },
+      coins: { type: 'number', example: 100 },
+      streak: { type: 'number', example: 0 },
+      isActive: { type: 'boolean', example: true },
+      role: { type: 'string', example: 'user' },
+      last_login: {
+        type: 'string',
+        format: 'date-time',
+        nullable: true,
+        example: null,
+      },
+      reset_token: { type: 'string', nullable: true, example: null },
+      reset_token_expiration: {
+        type: 'string',
+        format: 'date-time',
+        nullable: true,
+        example: null,
+      },
+      created_at: {
+        type: 'string',
+        format: 'date-time',
+        example: '2024-01-01T00:00:00.000Z',
+      },
+      updated_at: {
+        type: 'string',
+        format: 'date-time',
+        example: '2024-01-01T00:00:00.000Z',
+      },
+    },
+  })
   user: {
     email: string;
     username: string;
@@ -43,5 +101,11 @@ export interface RegisterResDTO {
     created_at: Date;
     updated_at: Date;
   };
+
+  @ApiProperty({
+    description: 'JWT access token',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    type: String,
+  })
   token: string;
 }
