@@ -20,4 +20,47 @@ export class UserService {
     }
     return UserResponseDTO.fromUser(user);
   }
+
+  async updateUserLevel(id: string, level: number): Promise<UserResponseDTO> {
+    const user = await this.prisma.users.update({
+      where: { id },
+      data: { current_level: level },
+    });
+    return UserResponseDTO.fromUser(user);
+  }
+
+  async updateUserXp(id: string, xp: number): Promise<UserResponseDTO> {
+    const user = await this.prisma.users.update({
+      where: { id },
+      data: { xp },
+    });
+    return UserResponseDTO.fromUser(user);
+  }
+
+  async updateUserCoins(id: string, coins: number): Promise<UserResponseDTO> {
+    const user = await this.prisma.users.update({
+      where: { id },
+      data: { coins },
+    });
+    return UserResponseDTO.fromUser(user);
+  }
+
+  async updateUserStreak(id: string, streak: number): Promise<UserResponseDTO> {
+    const user = await this.prisma.users.update({
+      where: { id },
+      data: { streak },
+    });
+    return UserResponseDTO.fromUser(user);
+  }
+
+  async updateUserIsPremium(
+    id: string,
+    isPremium: boolean,
+  ): Promise<UserResponseDTO> {
+    const user = await this.prisma.users.update({
+      where: { id },
+      data: { is_premium: isPremium },
+    });
+    return UserResponseDTO.fromUser(user);
+  }
 }
