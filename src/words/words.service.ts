@@ -123,7 +123,13 @@ export class WordsService {
   async getWordsByLanguage(
     getWordsDto: GetWordsDto,
   ): Promise<PaginatedWordsResponseDto> {
-    const { language_id, page = 1, limit = 10, level } = getWordsDto;
+    const {
+      language_id,
+      page = 1,
+      limit = 10,
+      level,
+      part_of_speech,
+    } = getWordsDto;
 
     // Check if language exists
     const language = await this.prisma.languages.findUnique({
@@ -138,12 +144,17 @@ export class WordsService {
     const whereClause: {
       language_id: string;
       level?: number;
+      part_of_speech?: string;
     } = {
       language_id,
     };
 
     if (level) {
       whereClause.level = level;
+    }
+
+    if (part_of_speech) {
+      whereClause.part_of_speech = part_of_speech;
     }
 
     // Get total count

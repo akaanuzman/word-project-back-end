@@ -47,4 +47,13 @@ export class GetWordsDto {
   @Min(1)
   @Max(6)
   level?: number;
+
+  @ApiProperty({
+    description: 'Search query to filter words by part of speech',
+    example: 'adverb',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  part_of_speech?: string;
 }
