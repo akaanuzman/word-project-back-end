@@ -45,6 +45,11 @@ export class AppConfigService {
       port: { type: 'number', key: 'APP_PORT', defaultValue: 3000 },
       env: { type: 'string', key: 'NODE_ENV', defaultValue: 'development' },
       debug: { type: 'boolean', key: 'APP_DEBUG', defaultValue: false },
+      baseUrl: {
+        type: 'string',
+        key: 'APP_BASE_URL',
+        defaultValue: 'http://localhost:4000',
+      },
     },
   );
 

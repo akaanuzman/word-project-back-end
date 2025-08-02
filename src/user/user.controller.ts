@@ -1,7 +1,72 @@
-import { Body, Controller, Get, Param, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Put,
+  Post,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 import { UserService } from './user.service';
 import { UserResponseDTO } from './DTOs/users.response';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// Reusable file upload interceptor
+const createFileUploadInterceptor = () => {
+  return FileInterceptor('image', {
+    storage: diskStorage({
+      destination: (req, file, cb) => {
+        const userId = req.params.id;
+        const userDir = path.join('assets', 'images', userId);
+
+        // Create directory if it doesn't exist
+        if (!fs.existsSync(userDir)) {
+          fs.mkdirSync(userDir, { recursive: true });
+        }
+
+        cb(null, userDir);
+      },
+      filename: (req, file, cb) => {
+        // Use original filename for temporary storage
+        cb(null, `temp_${Date.now()}_${file.originalname}`);
+      },
+    }),
+    fileFilter: (req, file, cb) => {
+      const allowedMimeTypes = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+      ];
+      if (allowedMimeTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(
+          new BadRequestException(
+            'Only image files are allowed (JPEG, PNG, GIF, WebP)',
+          ),
+          false,
+        );
+      }
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
+    },
+  });
+};
 
 @ApiTags('Users')
 @Controller('users')
@@ -147,5 +212,48 @@ export class UserController {
     @Body() isPremium: boolean,
   ): Promise<UserResponseDTO> {
     return this.userService.updateUserIsPremium(id, isPremium);
+  }
+
+  @ApiOperation({
+    summary: 'Upload user profile image',
+    description: 'Uploads a profile image for a user',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'Profile image file (JPEG, PNG, GIF, WebP, max 5MB)',
+        },
+      },
+      required: ['image'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile image uploaded successfully',
+    type: UserResponseDTO,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid file format or size',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
+  @Post(':id/profile-image')
+  @UseInterceptors(createFileUploadInterceptor())
+  async uploadProfileImage(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<UserResponseDTO> {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    return await this.userService.uploadProfileImage(id, file);
   }
 }

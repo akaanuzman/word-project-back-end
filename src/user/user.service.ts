@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserResponseDTO } from './DTOs/users.response';
+import { ImageService } from 'src/image/image.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly imageService: ImageService,
+  ) {}
 
   async getUsers(): Promise<UserResponseDTO[]> {
     const users = await this.prisma.users.findMany();
@@ -61,6 +65,44 @@ export class UserService {
       where: { id },
       data: { is_premium: isPremium },
     });
+    return UserResponseDTO.fromUser(user);
+  }
+
+  async updateUserProfileImage(
+    id: string,
+    profileImage: string,
+  ): Promise<UserResponseDTO> {
+    const user = await this.prisma.users.update({
+      where: { id },
+      data: { profile_image: profileImage },
+    });
+    return UserResponseDTO.fromUser(user);
+  }
+
+  async uploadProfileImage(
+    id: string,
+    file: Express.Multer.File,
+  ): Promise<UserResponseDTO> {
+    // Check if user exists
+    const existingUser = await this.prisma.users.findUnique({
+      where: { id },
+    });
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Upload and process image using ImageService
+    const imageResult = await this.imageService.uploadImage({
+      userId: id,
+      file,
+    });
+
+    // Update user's profile image in database
+    const user = await this.prisma.users.update({
+      where: { id },
+      data: { profile_image: imageResult.url },
+    });
+
     return UserResponseDTO.fromUser(user);
   }
 }
