@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from './config/config.module';
 import { MailModule } from './mail/mail.module';
 import { ImageModule } from './image/image.module';
+import { WordsModule } from './words/words.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ImageModule } from './image/image.module';
     AuthModule,
     MailModule,
     ImageModule,
+    WordsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
