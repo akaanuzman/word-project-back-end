@@ -18,7 +18,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'User Login',
     description:
-      'Authenticate user with email and password to receive access token',
+      'Authenticate user with email/username and password to receive access token',
   })
   @ApiBody({ type: LoginReqDTO })
   @ApiResponse({
@@ -32,7 +32,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Unauthorized - Invalid email or password',
+    description: 'Unauthorized - Invalid email/username or password',
   })
   @Post('login')
   @HttpCode(HttpStatus.OK)

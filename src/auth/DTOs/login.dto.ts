@@ -1,15 +1,14 @@
-import { IsEmail, IsBoolean, IsNotEmpty, MinLength } from 'class-validator';
+import { IsNotEmpty, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginReqDTO {
   @ApiProperty({
-    description: 'User email address',
+    description: 'User email address or username',
     example: 'user@example.com',
     type: String,
   })
-  @IsEmail({}, { message: 'Please enter a valid email address' })
-  @IsNotEmpty({ message: 'Email address is required' })
-  email: string;
+  @IsNotEmpty({ message: 'Email or username is required' })
+  identifier: string;
 
   @ApiProperty({
     description: 'User password (minimum 6 characters)',
@@ -20,15 +19,6 @@ export class LoginReqDTO {
   @IsNotEmpty({ message: 'Password is required' })
   @MinLength(6, { message: 'Password must be at least 6 characters' })
   password: string;
-
-  @ApiProperty({
-    description: 'Remember user login session',
-    example: false,
-    type: Boolean,
-    default: false,
-  })
-  @IsBoolean({ message: 'rememberMe must be a boolean value' })
-  rememberMe: boolean;
 }
 
 export class LoginResDTO {
