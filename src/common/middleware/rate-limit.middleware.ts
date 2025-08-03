@@ -17,7 +17,7 @@ interface RateLimitStore {
 export class RateLimitMiddleware implements NestMiddleware {
   private store: RateLimitStore = {};
   private readonly windowMs = 5 * 60 * 1000; // 5 minutes
-  private readonly maxRequests = 5; // 100 requests per window
+  private readonly maxRequests = 100; // 100 requests per window
 
   use(req: Request, res: Response, next: NextFunction) {
     const key = this.getClientKey(req);

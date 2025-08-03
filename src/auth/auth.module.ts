@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from 'src/mail/mail.service';
 import { AppConfigService } from '../config/config.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AppConfigService } from '../config/config.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, MailService],
+  providers: [AuthService, PrismaService, MailService, JwtAuthGuard],
+  exports: [JwtAuthGuard, JwtModule],
 })
 export class AuthModule {}

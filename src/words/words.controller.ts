@@ -16,6 +16,7 @@ import {
   ApiResponse,
   ApiConsumes,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { WordsService } from './words.service';
 import { CreateWordDto } from './DTOs/create-word.dto';
@@ -27,6 +28,7 @@ import {
 } from './DTOs/word.response';
 
 @ApiTags('Words')
+@ApiBearerAuth()
 @Controller('words')
 export class WordsController {
   constructor(private readonly wordsService: WordsService) {}
@@ -48,6 +50,10 @@ export class WordsController {
   @ApiResponse({
     status: 404,
     description: 'Language not found',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
   })
   async createWord(
     @Body() createWordDto: CreateWordDto,
@@ -75,6 +81,10 @@ export class WordsController {
   @ApiResponse({
     status: 400,
     description: 'Bad request - Invalid language IDs or data',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
   })
   async bulkCreateWords(
     @Body() bulkCreateWordsDto: BulkCreateWordsDto,
@@ -121,6 +131,10 @@ export class WordsController {
   @ApiResponse({
     status: 400,
     description: 'Bad request - Invalid file format or data',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
   })
   async bulkCreateWordsFromJson(
     @UploadedFile() file: Express.Multer.File,
@@ -172,6 +186,10 @@ export class WordsController {
     status: 404,
     description: 'Language not found',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
+  })
   async getWordsByLanguage(
     @Query() getWordsDto: GetWordsDto,
   ): Promise<PaginatedWordsResponseDto> {
@@ -191,6 +209,10 @@ export class WordsController {
   @ApiResponse({
     status: 404,
     description: 'Word not found',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
   })
   async getWordById(@Param('id') id: string): Promise<WordResponseDto> {
     return this.wordsService.getWordById(id);

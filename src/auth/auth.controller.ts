@@ -8,7 +8,13 @@ import {
   ResetPasswordReqDTO,
   ResetPasswordResDTO,
 } from './DTOs/password.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -18,12 +24,13 @@ export class AuthController {
   @ApiOperation({
     summary: 'User Login',
     description:
-      'Authenticate user with email/username and password to receive access token',
+      'Authenticate user with email/username and password to receive access token. Use the returned token in the Authorize button above for other endpoints.',
   })
   @ApiBody({ type: LoginReqDTO })
   @ApiResponse({
     status: 200,
-    description: 'Login successful',
+    description:
+      'Login successful - Copy the token and use it in the Authorize button',
     type: LoginResDTO,
   })
   @ApiResponse({
@@ -42,12 +49,14 @@ export class AuthController {
 
   @ApiOperation({
     summary: 'User Registration',
-    description: 'Create a new user account with email, username, and password',
+    description:
+      'Create a new user account with email, username, and password. Use the returned token in the Authorize button above for other endpoints.',
   })
   @ApiBody({ type: RegisterReqDTO })
   @ApiResponse({
     status: 201,
-    description: 'User registered successfully',
+    description:
+      'User registered successfully - Copy the token and use it in the Authorize button',
     type: RegisterResDTO,
   })
   @ApiResponse({
