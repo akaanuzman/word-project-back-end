@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -8,6 +8,7 @@ import { ConfigModule } from './config/config.module';
 import { MailModule } from './mail/mail.module';
 import { ImageModule } from './image/image.module';
 import { WordsModule } from './words/words.module';
+import { RateLimitMiddleware } from './common/middleware/rate-limit.middleware';
 
 @Module({
   imports: [
@@ -22,4 +23,10 @@ import { WordsModule } from './words/words.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(RateLimitMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+}

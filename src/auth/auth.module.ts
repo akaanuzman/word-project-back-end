@@ -4,12 +4,18 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from 'src/mail/mail.service';
+import { AppConfigService } from '../config/config.service';
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1d' },
+    JwtModule.registerAsync({
+      inject: [AppConfigService],
+      useFactory: (configService: AppConfigService) => ({
+        secret: configService.jwt.secret as string,
+        signOptions: {
+          expiresIn: configService.jwt.accessExpiration as string | number,
+        },
+      }),
     }),
   ],
   controllers: [AuthController],
