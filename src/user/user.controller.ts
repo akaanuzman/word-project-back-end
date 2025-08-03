@@ -19,6 +19,7 @@ import {
   ApiTags,
   ApiConsumes,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -69,6 +70,7 @@ const createFileUploadInterceptor = () => {
 };
 
 @ApiTags('Users')
+@ApiBearerAuth()
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -84,7 +86,7 @@ export class UserController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Unauthorized - Invalid email or password',
+    description: 'Unauthorized - Access token required',
   })
   @Get()
   async getUsers(): Promise<UserResponseDTO[]> {
@@ -104,6 +106,10 @@ export class UserController {
     status: 404,
     description: 'User not found',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
+  })
   @Get(':id')
   async getUserById(@Param('id') id: string): Promise<UserResponseDTO> {
     return this.userService.getUserById(id);
@@ -121,6 +127,10 @@ export class UserController {
   @ApiResponse({
     status: 404,
     description: 'User not found',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
   })
   @Put(':id/level')
   async updateUserLevel(
@@ -143,6 +153,10 @@ export class UserController {
     status: 404,
     description: 'User not found',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
+  })
   @Put(':id/xp')
   async updateUserXp(
     @Param('id') id: string,
@@ -163,6 +177,10 @@ export class UserController {
   @ApiResponse({
     status: 404,
     description: 'User not found',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
   })
   @Put(':id/coins')
   async updateUserCoins(
@@ -185,6 +203,10 @@ export class UserController {
     status: 404,
     description: 'User not found',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
+  })
   @Put(':id/streak')
   async updateUserStreak(
     @Param('id') id: string,
@@ -205,6 +227,10 @@ export class UserController {
   @ApiResponse({
     status: 404,
     description: 'User not found',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
   })
   @Put(':id/is-premium')
   async updateUserIsPremium(
@@ -244,6 +270,10 @@ export class UserController {
   @ApiResponse({
     status: 404,
     description: 'User not found',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Access token required',
   })
   @Post(':id/profile-image')
   @UseInterceptors(createFileUploadInterceptor())
